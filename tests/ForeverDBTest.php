@@ -16,7 +16,7 @@ class ForeverDBTest extends \PHPUnit_Framework_TestCase {
         $this->fdb->initDatabase();
     }
     
-    public function tearDown() 
+    public function teardown() 
     {
         unset($this->fdb);
         unset($this->pdo);
@@ -28,5 +28,17 @@ class ForeverDBTest extends \PHPUnit_Framework_TestCase {
         $class = $this->fdb->getClass('User');
         
         $this->assertFalse($class);
+    }
+    
+    /**
+     * @depends testGetClass
+     */
+    public function testCreateClass()
+    {
+        $class = $this->fdb->createClass('User');
+        
+        // PHP 5.4 compatibility
+        $dummy = new ForeverDB_Class(null, null, null);
+        $this->assertInstanceOf(get_class($dummy), $class);
     }
 }

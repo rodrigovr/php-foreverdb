@@ -21,27 +21,37 @@ class ForeverDB {
         $this->pdo = $pdo;
     } 
     
+    /** @return \PDO */
+    public function getPDO() {
+        return $this->pdo;
+    }
+    
     public function initDatabase() 
     {
-       $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_class (id INTEGER PRIMARY KEY ASC,  alive INT, name VARCHAR)');
+       $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_class    (id INTEGER PRIMARY KEY ASC, time INT, alive INT, name VARCHAR)');
+       $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_object   (id INTEGER PRIMARY KEY ASC, time INT, alive INT, class  INT, name VARCHAR)');
+       $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_attr_int (id INTEGER PRIMARY KEY ASC, time INT, alive INT, object INT, name VARCHAR, value INT)');
+       $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_attr_str (id INTEGER PRIMARY KEY ASC, time INT, alive INT, object INT, name VARCHAR, value TEXT)');
     }
     
     public function getClass($className)
     {
-        $prepare = $this->pdo->prepare("SELECT * FROM fdb_class WHERE alive = 1 and name = :class");
+        $prepare = $this->pdo->prepare("SELECT * FROM fdb_class WHERE name = :class ORDER BY id DESC LIMIT 1");
         $result = $prepare->execute([':class' => $className]);
         
         if (!$result) {
             return false;
         }
         
-        $row = $prepare->fetch();
+        $row = $prepare->fetch(\PDO::FETCH_ASSOC);
         
         if ($row === false) {
             return false;
         }
-        
-        $class = new ForeverDB_Class($this->pdo, $className, $row[0]['id']);
+        if (!$row['alive']) {
+            return false;
+        }
+        return new ForeverDB_Class($this, $className, $row['id']);
     }
     
     /**
@@ -58,12 +68,13 @@ class ForeverDB {
             return $class;
         }
         
-        $prepare = $this->pdo->prepare("INSERT INTO fdb_class INTO (alive, name) VALUES(, 1, :class)");
-        $prepare->execute([':class' => $className]);
-        
-        $class = new ForeverDB_Class($this->pdo, $className, $this->pdo->lastInsertId());
+        $prepare = $this->pdo->prepare("INSERT INTO fdb_class (time, alive, name) VALUES(:time, 1, :class)");
+        $prepare->execute([':class' => $className, ':time'=>time()]);
+        $id = $this->pdo->lastInsertId();
         $this->pdo->commit();
-        return $class;
+        
+        return new ForeverDB_Class($this, $className, $id);
+        
     }
     
 }
