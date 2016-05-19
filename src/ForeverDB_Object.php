@@ -49,9 +49,10 @@ class ForeverDB_Object {
     private function setT($type, $field, $value) 
     {
         $pdo = $this->class->getDB()->getPDO();
-        $prepare = $pdo->prepare("INSERT INTO fdb_attr_$type (time, alive, object, name, value) VALUES(:time, 1, :object, :name, :value)");
+        $prepare = $pdo->prepare("INSERT INTO fdb_attr_$type (time, alive, class, object, name, value) VALUES(:time, 1, :class, :object, :name, :value)");
         $prepare->execute([
             ':time'   => time(),
+            ':class'  => $this->getClass()->getId(),
             ':object' => $this->id,
             ':name'   => $field,
             ':value'  => $value
@@ -83,9 +84,10 @@ class ForeverDB_Object {
     private function unsetT($type, $field) 
     {
         $pdo = $this->class->getDB()->getPDO();
-        $prepare = $pdo->prepare("INSERT INTO fdb_attr_$type (time, alive, object, name) VALUES(:time, 0, :object, :name)");
+        $prepare = $pdo->prepare("INSERT INTO fdb_attr_$type (time, alive, class, object, name) VALUES(:time, 0, :class, :object, :name)");
         $prepare->execute([
             ':time'   => time(),
+            ':class'  => $this->getClass()->getId(),
             ':object' => $this->id,
             ':name'   => $field,
             ]);

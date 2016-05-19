@@ -31,7 +31,7 @@ class ForeverDB_ObjectTest extends \PHPUnit_Framework_TestCase {
         
         $john->delete();
         
-        $this->assertFalse($class->load("john"));
+        $this->assertFalse($class->find("john"));
         
     }
     

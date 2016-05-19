@@ -45,10 +45,27 @@ class ForeverDB_Class {
         $this->fdb = null;
     }
     
-    public function findAll($where = array())
+    public function findAll()
     {
-        
+        $pdo = $this->fdb->getPDO();
+        $prepare = $pdo->prepare("SELECT * FROM fdb_object WHERE class = :class ORDER BY id DESC");
+        $result = $prepare->execute([':class' => $this->name]);
+        if (!$result) {
+            return false;
+        }
+        $return = []; 
+        $names = [];
+        foreach($prepare->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+            if (!isset($names[$row["name"]])) {
+                $names[$row["name"]] = true;
+                if ($row["alive"] == 1) { 
+                        $return[] = new ForeverDB_Object($this, $row["name"], $row["id"]);
+                }
+            }
+        }
+        return $return;
     }
+    
     
     public function create($name)
     {
@@ -56,7 +73,7 @@ class ForeverDB_Class {
         
         $pdo->beginTransaction();
         
-        $object = $this->load($name);
+        $object = $this->find($name);
         if ($object) {
             $pdo->commit();
             return $object;
@@ -76,7 +93,7 @@ class ForeverDB_Class {
         return new ForeverDB_Object($this, $name, $id);
     }
     
-    public function load($name)
+    public function find($name)
     {
         $pdo = $this->fdb->getPDO();
         

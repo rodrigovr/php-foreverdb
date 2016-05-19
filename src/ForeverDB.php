@@ -30,8 +30,8 @@ class ForeverDB {
     {
        $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_class    (id INTEGER PRIMARY KEY ASC, time INT, alive INT, name VARCHAR)');
        $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_object   (id INTEGER PRIMARY KEY ASC, time INT, alive INT, class  INT, name VARCHAR)');
-       $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_attr_int (id INTEGER PRIMARY KEY ASC, time INT, alive INT, object INT, name VARCHAR, value INT)');
-       $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_attr_str (id INTEGER PRIMARY KEY ASC, time INT, alive INT, object INT, name VARCHAR, value TEXT)');
+       $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_attr_int (id INTEGER PRIMARY KEY ASC, time INT, alive INT, class  INT, object INT, name VARCHAR, value INT)');
+       $this->pdo->exec('CREATE TABLE IF NOT EXISTS fdb_attr_str (id INTEGER PRIMARY KEY ASC, time INT, alive INT, class  INT, object INT, name VARCHAR, value TEXT)');
     }
     
     public function getClass($className)

@@ -32,11 +32,11 @@ class ForeverDB_ClassTest extends \PHPUnit_Framework_TestCase {
         $this->assertFalse($this->fdb->getClass('User'));
     }
     
-    public function testLoad() 
+    public function testFind() 
     {
         $class = $this->fdb->createClass('User');
         
-        $jane = $class->load("Jane");
+        $jane = $class->find("Jane");
         
         $this->assertFalse($jane);
     }
@@ -48,5 +48,46 @@ class ForeverDB_ClassTest extends \PHPUnit_Framework_TestCase {
         $john = $class->create("John");
         
         $this->assertNotEmpty($john);
+    }
+    
+    public function testFindAll()
+    {
+        $class = $this->fdb->createClass('Place');
+        $places = ['Buenos Aires','São Paulo','New York','London','Tokio'];
+        
+        foreach($places as $place) {
+            $class->create($place);
+        }
+        
+        $found = $class->findAll();
+        
+        $this->assertEquals(count($places), count($found));
+        
+        foreach($found as $place) {
+            $this->assertTrue( in_array($place->getName(), $places) );
+        }
+    }
+    
+
+    public function testFindAll_withRemoval()
+    {
+        $class = $this->fdb->createClass('Place');
+        $places = ['Buenos Aires','São Paulo','New York','London','Tokio'];
+        
+        foreach($places as $place) {
+            $class->create($place);
+        }
+        
+        $idx = rand(0, 4);
+        $class->find($places[$idx])->delete();
+        unset($places[$idx]);
+        
+        $found = $class->findAll();
+        
+        $this->assertEquals(count($places), count($found));
+        
+        foreach($found as $place) {
+            $this->assertTrue( in_array($place->getName(), $places) );
+        }
     }
 }
