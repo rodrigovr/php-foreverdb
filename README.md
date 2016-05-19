@@ -1,4 +1,6 @@
-# php-foreverdb
+# php-foreverdb 
+
+![build status](https://travis-ci.org/rodrigovr/php-foreverdb.svg)
 
 This project is a WORK IN PROGRESS!
 
